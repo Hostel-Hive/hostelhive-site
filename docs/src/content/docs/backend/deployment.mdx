@@ -1,0 +1,58 @@
+---
+title: Backend deployment
+description: Deploy the HostelHive Go backend with a managed PostgreSQL database.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The backend compiles to one Go binary with no runtime dependencies, so any host that can build Go and set environment variables will do. The team's own development deployment runs on [Render](https://render.com/) with a managed Postgres database, and that's the setup described here.
+
+## The database
+
+Create a PostgreSQL 16 database with any managed provider and copy its connection string. Make sure it ends in `sslmode=require` or something stricter. Then run the migrations from your own machine:
+
+```powershell
+$env:DATABASE_URL = 'postgres://USER:PASSWORD@HOST:5432/DB?sslmode=require'
+.\scripts\migrate.ps1 up
+```
+
+## The web service
+
+<Steps>
+
+1. In Render, create a new Web Service from the `hostelhive-backend` repository and choose the Go runtime.
+
+2. Set the build command to `go build -o bin/hostelhive-server ./cmd/server` and the start command to `./bin/hostelhive-server`.
+
+3. Use `/ready` as the health check path. It fails when the database is unreachable, which is what you want a health check to catch.
+
+4. Upload the Firebase service-account JSON as a secret file. Render mounts secret files under `/etc/secrets/`.
+
+5. Add the environment variables below, then deploy.
+
+</Steps>
+
+| Variable | Value |
+| --- | --- |
+| `APP_ENV` | `production` |
+| `HTTP_ADDR` | `0.0.0.0:10000`, or whatever port your host routes to |
+| `DATABASE_URL` | The managed database's URL, with TLS |
+| `FIREBASE_PROJECT_ID` | Your Firebase project ID |
+| `GOOGLE_APPLICATION_CREDENTIALS` | `/etc/secrets/<your file name>` |
+| `CORS_ALLOWED_ORIGINS` | Your dashboard's address, e.g. `https://your-dashboard.vercel.app` |
+
+Turn on the [optional services](/backend/configuration/#optional-services) later, one at a time, as you set each one up.
+
+<Aside type="caution">Don't paste the service-account JSON into a normal environment variable. Those can end up in build logs. Use the host's secret-file feature.</Aside>
+
+Once it's up, `https://YOUR-BACKEND/health` and `/ready` should both return 200, and `/docs/` should show the API explorer.
+
+## Things to know in production
+
+TLS is handled by the host or by an Nginx proxy. The Go server itself only speaks HTTP.
+
+On SIGTERM the server stops taking new requests and gives running ones up to `HTTP_SHUTDOWN_TIMEOUT` to finish. The background jobs (revocations, photo cleanup, live counts, notifications, invitations) run in the same process and keep their queues in Postgres, so a restart doesn't lose work.
+
+Free plans that put idle services to sleep are a problem for the gates. A scanner whose request times out keeps the gate locked, so the first student after a quiet spell gets turned away. Run the backend that your scanners talk to on a plan that stays awake.
+
+The scanners trust one pinned root certificate. If your host changes the certificate authority behind your domain, update `API_ROOT_CA` in the firmware ([Configure and flash](/hardware/setup/)).

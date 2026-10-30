@@ -1,0 +1,53 @@
+---
+title: Web dashboard setup
+description: Run the HostelHive React staff dashboard and student web portal locally.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The web app lives in `hostelhive-frontend/web`. It's React with TypeScript, built by Vite, and one build serves both the staff dashboard and the student portal. You need Node.js 22.16.0 (pinned in the repository's `.nvmrc`), a [running backend](/backend/setup/) if you want to sign in, and your Firebase project's web config.
+
+<Steps>
+
+1. Install dependencies.
+
+   ```powershell
+   git clone https://github.com/Hostel-Hive/hostelhive-frontend.git
+   cd hostelhive-frontend/web
+   npm ci
+   ```
+
+2. Create `.env.local`. Only copy the example the first time, so you don't overwrite your own values later.
+
+   ```powershell
+   Copy-Item .env.example .env.local
+   ```
+
+   ```ini
+   VITE_API_BASE_URL=http://127.0.0.1:18080
+   VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+   VITE_FIREBASE_API_KEY=your-firebase-web-api-key
+   VITE_FIREBASE_AUTH_DOMAIN=your-firebase-project-id.firebaseapp.com
+   ```
+
+3. Start the dev server and open `http://127.0.0.1:5173`.
+
+   ```powershell
+   npm run dev
+   ```
+
+</Steps>
+
+Restart Vite after changing `.env.local`. If `VITE_API_BASE_URL` is missing or isn't a plain `http` or `https` address, both the dev server and the build stop with an error that says so.
+
+<Aside type="caution">Anything starting with `VITE_` is compiled into the JavaScript that browsers download, so treat it as public. Database URLs, service-account keys and R2 secrets never go here.</Aside>
+
+## Where things are
+
+Students sign in at `/login`, which is also where `/` sends you, and land on `/student` with their profile, room, presence and QR pass. Staff sign in at `/staff/login` and land on `/dashboard/admin` or `/dashboard/warden` depending on their role. `/forgot-password` sends a reset email, and `/reset-password` is the page that email links back to.
+
+Which dashboard opens is decided by the backend's `/api/v1/me` response, not by Firebase. A valid Firebase login with no active HostelHive account gets nowhere.
+
+## Checks
+
+`npm run build` type-checks and writes `dist/`. `npm run preview` serves that build on port 4173. Before a pull request, run `npm run lint`, `npm run format:check`, `npm run test:coverage` (it fails below 80% coverage) and `npm run build`.

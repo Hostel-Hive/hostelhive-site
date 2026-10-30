@@ -1,0 +1,319 @@
+/*
+ * HostelHive docs theme.
+ * Neutral page, brand ink for text, one cyan accent for links and the current page.
+ * Flat chrome: header and sidebar share the page background and are separated by hairlines.
+ */
+
+:root {
+	--sl-font: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+	--sl-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+	--sl-content-width: 44rem;
+	--sl-sidebar-width: 17rem;
+	--sl-nav-height: 3.75rem;
+	--sl-line-height: 1.7;
+	--sl-line-height-headings: 1.25;
+
+	--sl-text-h1: 2.125rem;
+	--sl-text-h2: 1.5rem;
+	--sl-text-h3: 1.1875rem;
+	--sl-text-h4: 1.0625rem;
+	--sl-text-h5: 1rem;
+	--sl-text-code: 0.875rem;
+
+	/* Dark (Starlight's default block) */
+	--sl-color-white: #f3f3f6;
+	--sl-color-gray-1: #dddce4;
+	--sl-color-gray-2: #c4c3cd;
+	--sl-color-gray-3: #8e8c9c;
+	--sl-color-gray-4: #5e5c6d;
+	--sl-color-gray-5: #302e3a;
+	--sl-color-gray-6: #1d1c25;
+	--sl-color-black: #141319;
+
+	--sl-color-accent-low: #0a2b3a;
+	--sl-color-accent: #38c2f5;
+	--sl-color-accent-high: #a9e4fa;
+
+	--hh-amber: #f0b44c;
+	--hh-red: #f07a7a;
+	--hh-green: #6fd39b;
+
+	--sl-color-bg-nav: var(--sl-color-black);
+	--sl-color-bg-sidebar: var(--sl-color-black);
+	--sl-color-hairline: var(--sl-color-gray-5);
+	--sl-color-hairline-light: var(--sl-color-gray-5);
+	--sl-color-bg-inline-code: var(--sl-color-gray-6);
+}
+
+:root[data-theme='light'] {
+	--sl-color-white: #17142b;
+	--sl-color-gray-1: #2a2740;
+	--sl-color-gray-2: #3b3850;
+	--sl-color-gray-3: #605d74;
+	--sl-color-gray-4: #8b8999;
+	--sl-color-gray-5: #e2e1e8;
+	--sl-color-gray-6: #f0f0f4;
+	--sl-color-gray-7: #f7f7f9;
+	--sl-color-black: #fcfcfd;
+
+	--sl-color-accent-low: #e3f3fa;
+	--sl-color-accent: #0071a3;
+	--sl-color-accent-high: #005479;
+
+	--hh-amber: #a15b00;
+	--hh-red: #b42323;
+	--hh-green: #15803d;
+
+	--sl-color-bg-nav: var(--sl-color-black);
+	--sl-color-bg-sidebar: var(--sl-color-black);
+	--sl-color-bg-inline-code: var(--sl-color-gray-6);
+}
+
+/* Header */
+.header {
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.site-title {
+	flex-direction: row-reverse;
+	gap: 0.4rem;
+	font-size: 1.125rem;
+	font-weight: 800;
+	letter-spacing: -0.04em;
+	color: var(--sl-color-white);
+}
+
+.site-title img {
+	height: 1.15rem;
+	width: auto;
+}
+
+/* Sidebar */
+.sidebar-pane {
+	border-inline-end: 1px solid var(--sl-color-hairline);
+}
+
+.sidebar-content .large {
+	font-size: 0.875rem;
+	font-weight: 650;
+	color: var(--sl-color-white);
+}
+
+.sidebar-content .top-level > li + li {
+	margin-top: 1.25rem;
+}
+
+.sidebar-content a {
+	font-size: 0.875rem;
+	color: var(--sl-color-gray-3);
+	border-radius: 0;
+}
+
+.sidebar-content ul ul li {
+	border-inline-start-color: var(--sl-color-hairline);
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+	background: none;
+	color: var(--sl-color-accent);
+	font-weight: 600;
+	box-shadow: inset 2px 0 0 var(--sl-color-accent);
+	margin-inline-start: calc(-1 * var(--sl-sidebar-item-padding-inline) - 1px);
+	padding-inline-start: calc(2 * var(--sl-sidebar-item-padding-inline) + 1px);
+}
+
+/* Page title and headings */
+.content-panel h1#_top {
+	font-weight: 700;
+	letter-spacing: -0.025em;
+}
+
+.sl-markdown-content :is(h2, h3, h4) {
+	font-weight: 680;
+	letter-spacing: -0.015em;
+}
+
+.sl-markdown-content h2:not(:where(.not-content *)) {
+	margin-top: 2.75rem;
+}
+
+.sl-markdown-content h3:not(:where(.not-content *)) {
+	margin-top: 2rem;
+}
+
+.sl-markdown-content :is(p, li) {
+	text-wrap: pretty;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+	color: var(--sl-color-accent);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+	color: var(--sl-color-accent-high);
+}
+
+/* Inline code: no box, just a quiet tint */
+.sl-markdown-content :not(pre) > code:not(:where(.not-content *)) {
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+	border: none;
+	font-size: 0.86em;
+	color: var(--sl-color-gray-1);
+}
+
+/* Tables: reference data, kept compact with a single rule under the header */
+.sl-markdown-content table:not(:where(.not-content *)) {
+	font-size: 0.9rem;
+	line-height: 1.55;
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	padding: 0.55rem 1.25rem 0.55rem 0;
+	border-bottom: none;
+}
+
+.sl-markdown-content th:not(:where(.not-content *)) {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: var(--sl-color-gray-3);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sl-markdown-content tr + tr td:not(:where(.not-content *)) {
+	border-top: 1px solid var(--sl-color-gray-6);
+}
+
+/* Asides: no tinted boxes, a coloured rule and a coloured title */
+.starlight-aside {
+	padding: 0.25rem 0 0.25rem 1rem;
+	background: none !important;
+	border-inline-start-width: 2px;
+	color: var(--sl-color-gray-2);
+}
+
+.starlight-aside--note {
+	--sl-color-asides-border: var(--sl-color-accent);
+	--sl-color-asides-text-accent: var(--sl-color-accent);
+}
+
+.starlight-aside--tip {
+	--sl-color-asides-border: var(--hh-green);
+	--sl-color-asides-text-accent: var(--hh-green);
+}
+
+.starlight-aside--caution {
+	--sl-color-asides-border: var(--hh-amber);
+	--sl-color-asides-text-accent: var(--hh-amber);
+}
+
+.starlight-aside--danger {
+	--sl-color-asides-border: var(--hh-red);
+	--sl-color-asides-text-accent: var(--hh-red);
+}
+
+.starlight-aside__title {
+	font-size: 0.875rem;
+}
+
+.starlight-aside__icon {
+	font-size: 1.1em;
+}
+
+/* Steps: small outlined counters */
+.sl-steps {
+	--bullet-size: 1.625rem;
+	--bullet-margin: 0.25rem;
+}
+
+.sl-steps > li::before {
+	background: var(--sl-color-black) !important;
+	border: 1px solid var(--sl-color-gray-4);
+	color: var(--sl-color-white) !important;
+	font-size: 0.8125rem !important;
+	font-weight: 600;
+}
+
+.sl-steps > li::after {
+	background-color: var(--sl-color-hairline) !important;
+	width: 1px !important;
+}
+
+/* Prev / next links at the bottom of each page */
+.pagination-links a {
+	box-shadow: none;
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 6px;
+}
+
+.pagination-links a:hover {
+	border-color: var(--sl-color-gray-4);
+}
+
+/* Front page index */
+.hh-front {
+	max-width: 52rem;
+}
+
+.hh-front .hh-lede {
+	font-size: 1.125rem;
+	color: var(--sl-color-gray-2);
+	max-width: 38rem;
+}
+
+.hh-index {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 3rem;
+	margin-top: 3rem;
+}
+
+.hh-index h2 {
+	margin: 0 !important;
+	padding-bottom: 0.75rem;
+	font-size: 1rem !important;
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.hh-index ul {
+	list-style: none;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.hh-index li {
+	margin: 0 !important;
+	padding: 0.9rem 0;
+}
+
+.hh-index li + li {
+	border-top: 1px solid var(--sl-color-gray-6);
+}
+
+.hh-index a {
+	font-weight: 600;
+	text-decoration: none !important;
+	color: var(--sl-color-white) !important;
+}
+
+.hh-index a:hover {
+	color: var(--sl-color-accent) !important;
+}
+
+.hh-index p {
+	margin: 0.2rem 0 0 !important;
+	font-size: 0.9rem;
+	color: var(--sl-color-gray-3);
+}
+
+@media (max-width: 50rem) {
+	.hh-index {
+		grid-template-columns: 1fr;
+		gap: 2.5rem;
+	}
+}

@@ -1,0 +1,49 @@
+---
+title: First administrator
+description: Bootstrap the first HostelHive admin account safely.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Signing in to Firebase isn't enough to use HostelHive. Each person also needs an active row in `hostelhive.users`, and there is no public sign-up page or bootstrap endpoint that creates one. So the very first admin is added by hand, once, by whoever owns the database. Every account after that is created from the dashboard.
+
+<Steps>
+
+1. In the Firebase console, open Authentication, then Users, and add a user with your email and a password. Copy the UID it shows.
+
+2. Run this against the HostelHive database in pgAdmin or `psql`, with your UID and email in place of the placeholders:
+
+   ```sql
+   BEGIN;
+   LOCK TABLE hostelhive.users IN SHARE ROW EXCLUSIVE MODE;
+   INSERT INTO hostelhive.users (firebase_uid, email, role, is_active)
+   SELECT 'YOUR_VERIFIED_FIREBASE_UID', lower('YOUR_VERIFIED_EMAIL'), 'admin', TRUE
+   WHERE NOT EXISTS (
+       SELECT 1 FROM hostelhive.users WHERE role = 'admin' AND is_active
+   )
+   ON CONFLICT (firebase_uid) DO UPDATE
+   SET role = 'admin', is_active = TRUE
+   WHERE lower(hostelhive.users.email) = lower(EXCLUDED.email)
+   RETURNING user_id, firebase_uid, email, role, is_active;
+   COMMIT;
+   ```
+
+   It only does anything while there's no active admin. If it returns no row, either an admin already exists or the UID and email don't belong to the same user. Find out which before you change anything.
+
+3. Sign in at `/staff/login` on the web dashboard. You should land on the Admin dashboard.
+
+</Steps>
+
+## More staff accounts
+
+From here on, create staff accounts from the dashboard. If you're scripting it, `POST /api/v1/users` takes an `email`, a `role` and an initial `password` (12 to 128 characters), with an `Idempotency-Key` header so a retry doesn't create a duplicate. The roles are `admin`, `warden`, `sub_warden`, `security_staff` and `student`.
+
+<Aside>Students shouldn't be created this way. Use [invitations](/guides/onboarding/), so they choose their own password and nobody else ever sees it.</Aside>
+
+## Changing or removing access
+
+A role change (`PATCH /api/v1/users/{user_id}/role`) takes effect on the user's next request. They don't need to sign in again.
+
+Deactivating someone (`POST /api/v1/users/{user_id}/deactivate`) blocks them in HostelHive straight away, then disables their Firebase login and signs them out everywhere. If Firebase is slow to respond you'll get a 202, and the backend keeps retrying that part until it succeeds. `POST /api/v1/users/{user_id}/activate` reverses it.
+
+HostelHive won't let you demote or deactivate the last active admin. You'll get `409 last_active_admin` instead.

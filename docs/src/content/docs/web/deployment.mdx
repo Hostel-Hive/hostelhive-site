@@ -1,0 +1,40 @@
+---
+title: Deploy the web dashboard
+description: Host the HostelHive React dashboard on Vercel and connect it to your backend.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The repository already has a `web/vercel.json`. It tells Vercel how to build the app, and it sends every path to `index.html` so that refreshing a page like `/dashboard/warden` doesn't 404.
+
+<Steps>
+
+1. In Vercel, add a new project from `Hostel-Hive/hostelhive-frontend`.
+
+2. Set the root directory to `web`.
+
+3. Add four environment variables: `VITE_API_BASE_URL` (your backend's address, such as `https://your-backend.onrender.com`), `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_API_KEY`, and `VITE_FIREBASE_AUTH_DOMAIN` (usually `<project-id>.firebaseapp.com`). Add them to Preview as well if you use preview deployments.
+
+4. Deploy.
+
+</Steps>
+
+## Let the backend accept it
+
+The browser calls the API directly, so the backend has to allow your dashboard's address. On the backend, set:
+
+```ini
+CORS_ALLOWED_ORIGINS=https://your-dashboard.vercel.app
+```
+
+and redeploy it. Origins must match exactly. Vercel's preview URLs aren't let in automatically, so add any you want to test against.
+
+## Firebase settings
+
+Two things in the Firebase console need your new address. Under Authentication, Settings, Authorized domains, add the Vercel domain. Under Authentication, Templates, Password reset, set the action URL to `https://your-dashboard.vercel.app/reset-password`.
+
+<Aside>If you move to a custom domain later, change all three together: the CORS setting, the authorized domain and the reset URL.</Aside>
+
+## A quick check after deploying
+
+Open `/dashboard/admin` while signed out; it should send you to the login page. Sign in once as an Admin and once as a Warden, and check that each only sees their own dashboard. Refresh a dashboard page to make sure it loads again. Finally, use "Forgot password" and follow the email through to `/reset-password`.

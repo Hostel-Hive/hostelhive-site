@@ -1,0 +1,67 @@
+---
+title: Quick start
+description: Run the full HostelHive stack on your machine, from database to gate simulation.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This gets every part of HostelHive running locally, in the order they depend on each other.
+
+You'll need Go 1.27.3 or newer, Docker Desktop, and Node.js 22.16.0 (the version in the frontend's `.nvmrc`). Flutter 3.47 is only needed for the mobile app, and PlatformIO with the Wokwi VS Code extension only for the gate simulator.
+
+<Aside>The backend's helper scripts are PowerShell, so the commands below are too. On macOS or Linux, set the same environment variables in your shell and run the Go commands directly.</Aside>
+
+<Steps>
+
+1. Create a Firebase project and turn on Email/Password sign-in under Authentication. In Project settings, under Service accounts, generate a private key and save the JSON somewhere outside every repository. Note the project ID and the web API key.
+
+2. Start PostgreSQL in Docker:
+
+   ```powershell
+   $env:POSTGRES_PASSWORD = 'local-dev-only'
+   docker run --name hostelhive-postgres -d -p 127.0.0.1:15433:5432 -e POSTGRES_PASSWORD -e POSTGRES_USER=hostelhive -e POSTGRES_DB=hostelhive postgres:16-alpine
+   ```
+
+3. Clone and start the backend. In `.env.local`, fill in `DATABASE_URL`, `FIREBASE_PROJECT_ID` and the path to your service-account JSON.
+
+   ```powershell
+   git clone https://github.com/Hostel-Hive/hostelhive-backend.git
+   cd hostelhive-backend
+   Copy-Item .env.example .env.local
+   .\scripts\install-migrate.ps1
+   .\scripts\dev.ps1 -Migrate
+   ```
+
+   `http://127.0.0.1:18080/ready` should answer `{"status":"ready"}`. The API explorer is at `/docs/` on the same port. [Backend setup](/backend/setup/) has the details.
+
+4. Make yourself the first admin. Add a user in the Firebase console, then run the SQL on [First administrator](/backend/first-admin/) with that user's UID.
+
+5. Start the web app, pointing `VITE_API_BASE_URL` at `http://127.0.0.1:18080`:
+
+   ```powershell
+   git clone https://github.com/Hostel-Hive/hostelhive-frontend.git
+   cd hostelhive-frontend/web
+   npm ci
+   Copy-Item .env.example .env.local
+   npm run dev
+   ```
+
+   Sign in at `http://127.0.0.1:5173/staff/login`.
+
+6. If you want the mobile app too:
+
+   ```bash
+   git clone https://github.com/Hostel-Hive/hostelhive-mobileapp.git
+   cd hostelhive-mobileapp
+   cp .env.example .env
+   flutter pub get
+   flutter run --dart-define-from-file=.env
+   ```
+
+   Leave `.env` empty and the app runs on demo data instead.
+
+7. To try a gate without hardware, register a scanner, put its credential in the firmware's `secrets.h`, and run the Wokwi simulation. See [Configure and flash](/hardware/setup/) and [Wokwi simulation](/hardware/simulation/).
+
+</Steps>
+
+Once it's all running, [add a few students](/guides/onboarding/). When you're ready to put it online, follow [Backend deployment](/backend/deployment/) and then [Deploy the web dashboard](/web/deployment/).

@@ -1,0 +1,59 @@
+---
+title: Mobile app setup
+description: Build and run the HostelHive Flutter student app.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The student app is in `hostelhive-mobileapp` and built with Flutter. It's where students keep their QR pass, ask for late access, say they're going home, file complaints and read their inbox. You'll need Flutter 3.47 or newer on the stable channel (Dart 3.13+), plus Android Studio or Xcode. The app supports Android 10 and later.
+
+<Steps>
+
+1. Clone it and switch to `develop`.
+
+   ```bash
+   git clone https://github.com/Hostel-Hive/hostelhive-mobileapp.git
+   cd hostelhive-mobileapp
+   git checkout develop
+   ```
+
+2. Create `.env` from the example and fill it in.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   ```ini
+   API_BASE_URL=https://YOUR_API_HOST/api/v1
+   FIREBASE_API_KEY=your-firebase-web-api-key
+   ```
+
+   Unlike the web app, this URL includes `/api/v1`. From the Android emulator, a backend on your own machine is at `http://10.0.2.2:18080/api/v1`.
+
+3. Run it.
+
+   ```bash
+   flutter pub get
+   flutter run --dart-define-from-file=.env
+   ```
+
+</Steps>
+
+<Aside>Leave both values in `.env` empty and the app runs on built-in demo data. It's a quick way to click through the screens without a backend.</Aside>
+
+Students sign in with the email address they were [invited with](/guides/onboarding/). The first time, they finish setting up from the link in that email.
+
+Push notifications need Firebase Cloud Messaging configured in the app and `FCM_ENABLED=true` on the backend. The backend's [push notification guide](https://github.com/Hostel-Hive/hostelhive-backend/blob/main/docs/mobile-push-notifications.md) covers both sides.
+
+## Checks
+
+These run in GitHub Actions on every push, and it's worth running them before you push:
+
+```bash
+dart format --set-exit-if-changed .
+flutter analyze
+flutter test --coverage
+flutter build apk --debug
+```
+
+The code is organised as `lib/core` for theme, routing and shared widgets, `lib/data` for models and repositories, and `lib/features` with one folder per feature (auth, passes, complaints, inbox, qr, profile, home). Tests are in `test/`.

@@ -1,0 +1,28 @@
+---
+title: API reference
+description: Explore and call the HostelHive REST API through the built-in Swagger UI and OpenAPI spec.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The backend documents its own API. Every running instance serves Swagger UI at `/docs/` and the raw OpenAPI 3.0.3 spec at `/openapi.json`, both built into the binary, so there's nothing extra to host. Locally that's `http://127.0.0.1:18080/docs/`. A copy of the spec is also committed to the backend repository as [`docs/openapi.json`](https://github.com/Hostel-Hive/hostelhive-backend/blob/main/docs/openapi.json), which you can import into Postman or use to generate a client.
+
+## Trying requests in Swagger
+
+Sign in with a test account and get its Firebase ID token. The backend repository has `scripts/get-firebase-token.ps1` for this. In Swagger, click Authorize, pick FirebaseBearer and paste the token on its own, without the word `Bearer`. Each operation lists which roles may call it under Access.
+
+<Aside type="caution">Try it out sends real requests. Anything that writes will change data, so point it at test records.</Aside>
+
+The two scanner routes, `/api/v1/device/check` and `/api/v1/device/scans`, use the ScannerBearer scheme instead. That takes the `hhd1.` credential you get when registering a scanner. A Firebase token won't work there, and a scanner credential won't work anywhere else.
+
+## Conventions
+
+Every business route is under `/api/v1` and needs an `Authorization: Bearer` header with a Firebase ID token. A 401 means the token is missing, expired or revoked. A 403 means the token is fine but the account is inactive, the role isn't allowed, or the record belongs to someone else.
+
+Errors are small JSON objects such as `{"error":"unauthorized"}`. They never include tokens, stack traces or database messages.
+
+Endpoints that create something or record a decision take a `request_id` in the body or an `Idempotency-Key` header. If a request times out, send it again with the same value. You'll get the original result back rather than a duplicate.
+
+Lists take `limit` (1 to 100) and `offset`, and tell you whether there's more with `has_more`. Responses containing personal data are sent with `Cache-Control: no-store`.
+
+If you're building against the API from Flutter, the backend repository has a longer integration guide and a Postman collection under [`docs/mobile-integration/`](https://github.com/Hostel-Hive/hostelhive-backend/tree/main/docs/mobile-integration).

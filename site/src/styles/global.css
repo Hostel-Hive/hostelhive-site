@@ -1,0 +1,159 @@
+/* Colours follow the web app's Figma tokens (hostelhive-frontend/web/src/styles/tokens.css). */
+:root {
+	--ink: #181037;
+	--ink-soft: #453d66;
+	--muted: #605a82;
+	--line: #e4e4ec;
+	--surface: #ffffff;
+	--page: #f7f7fb;
+	--tint: #f1effc;
+	--cyan: #00aeef;
+	--link: #0074a8;
+	--button: #181037;
+	--button-text: #ffffff;
+
+	--font-ui: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+	--width: min(1180px, 100% - 2.5rem);
+	--radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--ink: #f1f0f7;
+		--ink-soft: #cfcde0;
+		--muted: #a7a5ba;
+		--line: #2c2840;
+		--surface: #18152a;
+		--page: #110e1f;
+		--tint: #1c1834;
+		--cyan: #38c2f5;
+		--link: #7ad5f8;
+		--button: #f1f0f7;
+		--button-text: #181037;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	margin: 0;
+	background: var(--page);
+	color: var(--ink);
+	font-family: var(--font-ui);
+	font-size: 1.0625rem;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+a {
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--cyan);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0;
+	line-height: 1.12;
+	letter-spacing: -0.03em;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+code {
+	font-family: var(--font-mono);
+	font-size: 0.9em;
+}
+
+.wrap {
+	width: var(--width);
+	margin-inline: auto;
+}
+
+.accent {
+	font-style: italic;
+	color: var(--cyan);
+	padding-right: 0.08em;
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.2rem;
+	border-radius: 10px;
+	border: 1px solid transparent;
+	font-weight: 600;
+	font-size: 0.95rem;
+	white-space: nowrap;
+	text-decoration: none;
+	transition:
+		background-color 0.15s,
+		border-color 0.15s,
+		transform 0.1s;
+}
+
+.btn:active {
+	transform: translateY(1px);
+}
+
+.btn svg {
+	width: 1.1em;
+	height: 1.1em;
+}
+
+.btn-primary {
+	background: var(--button);
+	color: var(--button-text);
+}
+
+.btn-primary:hover {
+	background: color-mix(in srgb, var(--button) 85%, var(--cyan));
+}
+
+.btn-secondary {
+	border-color: var(--line);
+	background: var(--surface);
+	color: var(--ink);
+}
+
+.btn-secondary:hover {
+	border-color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+	}
+}

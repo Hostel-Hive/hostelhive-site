@@ -1,0 +1,75 @@
+---
+title: Configure and flash
+description: Register a scanner, configure the firmware secrets and flash an ESP32 gate node.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+You'll need [PlatformIO](https://platformio.org/install) (the CLI or the VS Code extension) and an Admin account on a running backend.
+
+## Register the scanner
+
+Every gate gets its own credential. As an Admin, register the scanner by name:
+
+```http
+POST /api/v1/scanner-devices
+Content-Type: application/json
+
+{ "name": "Gate-01" }
+```
+
+The response includes the device's `id` and a `credential` that looks like `hhd1.<device-uuid>.<secret>`. Copy the credential now. It's only ever shown in this response. If you lose it, rotate it with `POST /api/v1/scanner-devices/{id}/rotate-credential`, which also kills the old one.
+
+Then tell the backend which way this gate faces, `IN` for an entrance or `OUT` for an exit:
+
+```http
+PUT /api/v1/scanner-devices/{id}/direction
+Content-Type: application/json
+
+{ "direction": "IN" }
+```
+
+Until it has a direction, every scan is refused with GATE NOT CONFIGURED. You can check a credential without scanning anything by calling `GET /api/v1/device/check` with it.
+
+## Put the credential in the firmware
+
+<Steps>
+
+1. Clone the firmware and copy the secrets template.
+
+   ```bash
+   git clone https://github.com/Hostel-Hive/hostelhive-hardware.git
+   cd hostelhive-hardware
+   cp include/secrets.example.h include/secrets.h
+   ```
+
+2. Edit `include/secrets.h`, which Git ignores. Set `WIFI_SSID` and `WIFI_PASSWORD` for the gate's network. Set `API_BASE_URL` to the backend's `https://` address with no path. Paste the root certificate of the backend's TLS chain into `API_ROOT_CA` as PEM. Put the `hhd1.` credential in `DEVICE_CREDENTIAL`. If you're not in Sri Lanka, change `GMT_OFFSET_SEC` too.
+
+3. Build and flash with the production profile:
+
+   ```bash
+   pio run -e esp32prod
+   pio run -e esp32prod --target upload
+   pio device monitor --speed 115200
+   ```
+
+</Steps>
+
+On boot the screen joins Wi-Fi, syncs the clock and then shows SCAN ID.
+
+There are three build profiles. `esp32prod` is for real gates: HTTPS only, and no QR input from USB. `esp32dev` is for development and the simulator. `native_test` runs the unit tests on your computer.
+
+<Aside type="caution">If a credential leaks, rotate it. The old one stops working on its very next request.</Aside>
+
+## Tests
+
+```bash
+python test/run_tests.py
+pio test -e native_test
+```
+
+The first needs nothing installed. The second runs the Unity tests for QR parsing, the cooldown, and the open-or-stay-locked decision.
+
+## Looking after scanners
+
+`GET /api/v1/scanner-devices` lists them. `POST /api/v1/scanner-devices/{id}/rotate-credential` issues a new credential and `POST /api/v1/scanner-devices/{id}/deactivate` retires one. Only active Admins can do any of this, and a scanner credential only works on the two `/api/v1/device/` routes.

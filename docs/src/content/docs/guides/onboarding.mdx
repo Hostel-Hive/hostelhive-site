@@ -1,0 +1,34 @@
+---
+title: Adding students
+description: Invite students by email or CSV and get them signed in.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Students join by invitation. An Admin enters the student's email and profile, and HostelHive has Firebase send them a private email to choose a password. The Admin never sees that password, and never gets a link that could be used to set one.
+
+## Turning invitations on
+
+The backend needs migration 26 or later, `STUDENT_INVITATIONS_ENABLED=true`, and `STUDENT_EMAIL_DOMAINS` set to your students' email domains, for example `students.example.edu`. In Firebase, the password-reset template's action URL should point at your dashboard's `/reset-password` page ([how](/web/deployment/#firebase-settings)).
+
+## Inviting
+
+For one student, fill in the registration form on the Admin dashboard: email, index number, name, faculty, year, phone and at least one guardian.
+
+For a whole intake, download the CSV template, fill in a row per student and upload it. You get a report back row by row. Good rows are imported even if others have mistakes, so fix the failed rows and upload just those again.
+
+The invitations list shows who has finished setting up. If someone lost the email, resend it from there.
+
+The same actions are available through the API as `POST /api/v1/student-invitations`, `GET /api/v1/student-invitations/import/template`, `POST /api/v1/student-invitations/import` and `POST /api/v1/student-invitations/{id}/resend`.
+
+## What the student sees
+
+They get an email, open the link and choose a password on Firebase's page. Then they sign in to the app, or to the web portal at `/login`, with that email and password. The app finishes the setup by itself and opens their home screen.
+
+<Aside>This isn't single sign-on with the university, and students never type their university password into HostelHive. The email address is just how they're identified. Changing or resetting the password later goes through Firebase like any other account.</Aside>
+
+## Afterwards
+
+Give each student a bed from the Admin or Warden dashboard. Every assignment, move and removal is kept in their history.
+
+Their QR pass is created the first time they open it and doesn't change after that. They can update their own phone number, guardians and photo, while everything else on their profile stays under staff control.

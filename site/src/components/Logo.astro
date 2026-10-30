@@ -1,0 +1,25 @@
+---
+// Same wordmark and H glyph as the web app's sign-in header (hostelhive-frontend/web/src/layouts/AuthLayout.tsx).
+---
+
+<span class="logo">
+	<span>HostelHive</span>
+	<svg width="17" height="20" viewBox="0 0 28 32" aria-hidden="true">
+		<path fill="currentColor" d="M2 5h6v9h12V1h6v30h-6V20H8v11H2z"></path>
+	</svg>
+</span>
+
+<style>
+	.logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-weight: 800;
+		font-size: 1.15rem;
+		letter-spacing: -0.04em;
+	}
+
+	svg {
+		color: var(--cyan);
+	}
+</style>

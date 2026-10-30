@@ -1,0 +1,114 @@
+---
+title: Backend local setup
+description: Run the HostelHive Go backend locally with PostgreSQL and Firebase Authentication.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The backend won't start without a database and a Firebase project, so this page sets up both. You'll need Go 1.27.3 or newer (earlier 1.27 releases are missing security fixes), Git, Docker Desktop, and a Firebase service-account key saved outside the repository.
+
+<Steps>
+
+1. Clone the repository.
+
+   ```powershell
+   git clone https://github.com/Hostel-Hive/hostelhive-backend.git
+   cd hostelhive-backend
+   ```
+
+2. Create the PostgreSQL container. You only do this once.
+
+   ```powershell
+   $env:POSTGRES_PASSWORD = 'local-dev-only'
+   docker run --name hostelhive-postgres -d -p 127.0.0.1:15433:5432 -e POSTGRES_PASSWORD -e POSTGRES_USER=hostelhive -e POSTGRES_DB=hostelhive postgres:16-alpine
+   docker exec hostelhive-postgres pg_isready -U hostelhive -d hostelhive
+   ```
+
+   Wait for `accepting connections`. On later days, `docker start hostelhive-postgres` is enough.
+
+3. Copy the example settings and open the copy.
+
+   ```powershell
+   Copy-Item .env.example .env.local
+   notepad .env.local
+   ```
+
+   These three lines are the ones that matter for a first run:
+
+   ```ini
+   DATABASE_URL=postgres://hostelhive:local-dev-only@127.0.0.1:15433/hostelhive?sslmode=disable
+   FIREBASE_PROJECT_ID=your-firebase-project-id
+   GOOGLE_APPLICATION_CREDENTIALS=C:/private/hostelhive-service-account.json
+   ```
+
+   Git ignores `.env.local`. Every other setting is described on [Configuration](/backend/configuration/).
+
+4. Install the migration tool, create the tables and start the server.
+
+   ```powershell
+   .\scripts\install-migrate.ps1
+   .\scripts\dev.ps1 -Migrate
+   ```
+
+</Steps>
+
+## Starting it day to day
+
+```powershell
+.\scripts\dev.ps1
+```
+
+The script reads `.env.local`, checks that the required values and the credentials file are there, starts the Postgres container, waits for it, and runs `go run ./cmd/server`. Ctrl+C stops the server and leaves the database running.
+
+It takes a few flags. `-Check` validates your settings without starting anything. `-Migrate` applies pending migrations first. `-SkipDatabase` skips Docker when `DATABASE_URL` points at a hosted database. `-EnvFile` and `-DatabaseContainer` let you use a different settings file or container name.
+
+## Checking it works
+
+```powershell
+curl.exe -i http://127.0.0.1:18080/health
+curl.exe -i http://127.0.0.1:18080/ready
+curl.exe -i http://127.0.0.1:18080/api/v1/me
+```
+
+`/health` returns 200 as long as the process is up. `/ready` also pings the database and returns 503 if it can't reach it. `/api/v1/me` should return 401, because you didn't send a token. The interactive API explorer is at `http://127.0.0.1:18080/docs/`.
+
+## Running without the script
+
+The Go binary never reads `.env` files. It only sees environment variables, so set them yourself:
+
+<Tabs>
+	<TabItem label="PowerShell">
+		```powershell
+		$env:DATABASE_URL = 'postgres://hostelhive:local-dev-only@127.0.0.1:15433/hostelhive?sslmode=disable'
+		$env:FIREBASE_PROJECT_ID = 'your-firebase-project-id'
+		$env:GOOGLE_APPLICATION_CREDENTIALS = 'C:/private/hostelhive-service-account.json'
+		$env:HTTP_ADDR = '127.0.0.1:18080'
+		go run ./cmd/server
+		```
+	</TabItem>
+	<TabItem label="Bash">
+		```bash
+		export DATABASE_URL='postgres://hostelhive:local-dev-only@127.0.0.1:15433/hostelhive?sslmode=disable'
+		export FIREBASE_PROJECT_ID='your-firebase-project-id'
+		export GOOGLE_APPLICATION_CREDENTIALS="$HOME/private/hostelhive-service-account.json"
+		export HTTP_ADDR='127.0.0.1:18080'
+		go run ./cmd/server
+		```
+	</TabItem>
+</Tabs>
+
+To build a binary instead, run `go build -o ./bin/hostelhive-server ./cmd/server` (add `.exe` on Windows).
+
+<Aside type="caution">Keep the service-account JSON, `.env.local` and database passwords out of Git, issues and chat. The Firebase Auth emulator won't work: the backend rejects it on purpose because it accepts unsigned tokens.</Aside>
+
+## Before you open a pull request
+
+```powershell
+gofmt -l ./cmd ./internal ./tests
+go vet ./...
+go test -count=1 -timeout=45s ./...
+go build ./...
+.\scripts\test-migrations.ps1
+```
+
+`gofmt -l` should print nothing. The `scripts/test-*.ps1` suites each spin up a throwaway Postgres container, run against it, and delete it, so they never touch your development data.

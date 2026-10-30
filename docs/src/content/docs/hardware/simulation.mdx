@@ -1,0 +1,35 @@
+---
+title: Wokwi simulation
+description: Run the HostelHive gate firmware in a virtual ESP32 without any hardware.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The hardware repository includes a full [Wokwi](https://wokwi.com/) circuit, so you can run the real firmware on a virtual ESP32 before buying anything.
+
+Install the Wokwi for VS Code extension, build the development firmware with `pio run -e esp32dev`, open `simulation/diagram.json`, and run Wokwi: Start Simulator from the command palette. The virtual board joins the `Wokwi-GUEST` network, lights up the OLED and shows SCAN ID.
+
+## Scanning in the simulator
+
+There's no camera, so you type the pass into the Serial Monitor instead. Get a real one first: decode the QR image from `GET /api/v1/me/qr` or `GET /api/v1/students/{id}/qr`, which gives you `HH1:` and 64 hex characters. Paste it and press Enter. The screen shows AUTHENTICATING while it asks the backend, then opens the gate if the backend agrees.
+
+Anything that isn't a valid pass shows INVALID QR CODE. The same pass twice within 15 seconds shows DUPLICATE SCAN. Holding the blue button for a second opens the gate as a manual override and logs it.
+
+## Reaching the backend
+
+The simulator runs slower than real time, and its TLS handshake with a hosted backend is often too slow to finish. You'll see `start_ssl_client: -80` in the log. The fix is a small relay on your own computer:
+
+```bash
+python simulation/https_relay.py
+```
+
+Then point the firmware at the relay in `secrets.h`:
+
+```c
+#define API_BASE_URL "http://host.wokwi.internal:8080"
+#define ALLOW_INSECURE_HTTP 1
+```
+
+The relay forwards only `/api/v1/device/*`, and it talks to the real backend over verified HTTPS. The same two settings also work for a backend running on your own machine.
+
+<Aside type="caution">`ALLOW_INSECURE_HTTP` is for the simulator only. The `esp32prod` build ignores it.</Aside>
