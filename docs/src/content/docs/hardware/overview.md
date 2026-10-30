@@ -27,4 +27,4 @@ The firmware won't compile without `include/secrets.h`. Even then it refuses to 
 
 It checks the server's certificate against that one pinned root and never follows redirects, so the credential can't be sent to another host. The production build, `esp32prod`, also ignores QR input from the USB port and can't be switched to plain HTTP. Passes and credentials are never printed in full to the serial log; you'll only see something like `HH1:0123...`.
 
-To build one, start with [Wiring and parts](/hardware/wiring/), then [Configure and flash](/hardware/setup/). To try it without any parts, use the [Wokwi simulation](/hardware/simulation/).
+To build one, start with [Wiring and parts](/hardware/wiring/), then [Configure and flash](/hardware/setup/).

@@ -5,7 +5,7 @@ description: Register a scanner, configure the firmware secrets and flash an ESP
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-You'll need [PlatformIO](https://platformio.org/install) (the CLI or the VS Code extension) and an Admin account on a running backend.
+You'll need an ESP32 board wired as described in [Wiring and parts](/hardware/wiring/), a USB cable, and an Admin account on a running backend.
 
 ## Register the scanner
 
@@ -45,7 +45,7 @@ Until it has a direction, every scan is refused with GATE NOT CONFIGURED. You ca
 
 2. Edit `include/secrets.h`, which Git ignores. Set `WIFI_SSID` and `WIFI_PASSWORD` for the gate's network. Set `API_BASE_URL` to the backend's `https://` address with no path. Paste the root certificate of the backend's TLS chain into `API_ROOT_CA` as PEM. Put the `hhd1.` credential in `DEVICE_CREDENTIAL`. If you're not in Sri Lanka, change `GMT_OFFSET_SEC` too.
 
-3. Build and flash with the production profile:
+3. Connect the ESP32 over USB, then build the firmware and flash it with the production profile:
 
    ```bash
    pio run -e esp32prod
@@ -57,7 +57,7 @@ Until it has a direction, every scan is refused with GATE NOT CONFIGURED. You ca
 
 On boot the screen joins Wi-Fi, syncs the clock and then shows SCAN ID.
 
-There are three build profiles. `esp32prod` is for real gates: HTTPS only, and no QR input from USB. `esp32dev` is for development and the simulator. `native_test` runs the unit tests on your computer.
+There are three build profiles. `esp32prod` is for real gates: HTTPS only, and no QR input from USB. `esp32dev` is for development. `native_test` runs the unit tests on your computer.
 
 <Aside type="caution">If a credential leaks, rotate it. The old one stops working on its very next request.</Aside>
 

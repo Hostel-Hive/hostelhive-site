@@ -6,5 +6,5 @@ export const repos = [
 	{ name: 'hostelhive-backend', stack: 'Go, PostgreSQL, Firebase', summary: 'REST API, auth, attendance, passes, complaints and reports.' },
 	{ name: 'hostelhive-frontend', stack: 'React, TypeScript, Vite', summary: 'Staff dashboard and student web portal.' },
 	{ name: 'hostelhive-mobileapp', stack: 'Flutter, Dart', summary: 'Student app for passes, QR, complaints and inbox.' },
-	{ name: 'hostelhive-hardware', stack: 'ESP32, PlatformIO', summary: 'QR gate scanner firmware with Wokwi simulation.' },
+	{ name: 'hostelhive-hardware', stack: 'ESP32', summary: 'Firmware for the ESP32 QR gate scanners.' },
 ];

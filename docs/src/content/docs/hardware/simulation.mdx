@@ -1,13 +1,16 @@
 ---
-title: Wokwi simulation
+title: ESP32 simulator (optional)
 description: Run the HostelHive gate firmware in a virtual ESP32 without any hardware.
+sidebar:
+  hidden: true
+pagefind: false
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
 The hardware repository includes a full [Wokwi](https://wokwi.com/) circuit, so you can run the real firmware on a virtual ESP32 before buying anything.
 
-Install the Wokwi for VS Code extension, build the development firmware with `pio run -e esp32dev`, open `simulation/diagram.json`, and run Wokwi: Start Simulator from the command palette. The virtual board joins the `Wokwi-GUEST` network, lights up the OLED and shows SCAN ID.
+Install the Wokwi for VS Code extension, build the firmware with the `esp32dev` profile, open `simulation/diagram.json`, and run Wokwi: Start Simulator from the command palette. The virtual board joins the `Wokwi-GUEST` network, lights up the OLED and shows SCAN ID.
 
 ## Scanning in the simulator
 

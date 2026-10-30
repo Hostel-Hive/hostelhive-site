@@ -69,7 +69,6 @@ export default defineConfig({
 						{ label: 'How the gates work', slug: 'hardware/overview' },
 						{ label: 'Wiring and parts', slug: 'hardware/wiring' },
 						{ label: 'Configure and flash', slug: 'hardware/setup' },
-						{ label: 'Wokwi simulation', slug: 'hardware/simulation' },
 					],
 				},
 				{

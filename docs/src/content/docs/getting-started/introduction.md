@@ -25,6 +25,6 @@ There are four repositories in the [Hostel-Hive organisation](https://github.com
 
 [hostelhive-mobileapp](https://github.com/Hostel-Hive/hostelhive-mobileapp) is the Flutter app for students.
 
-[hostelhive-hardware](https://github.com/Hostel-Hive/hostelhive-hardware) is the firmware for the ESP32 gate scanners, plus a Wokwi circuit so you can test it without any parts.
+[hostelhive-hardware](https://github.com/Hostel-Hive/hostelhive-hardware) is the firmware for the ESP32 gate scanners.
 
 If you want everything running on your machine, go to the [quick start](/getting-started/quick-start/). For how the pieces talk to each other, read [Architecture](/getting-started/architecture/).

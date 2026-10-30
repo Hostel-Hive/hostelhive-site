@@ -22,7 +22,7 @@ Open the pull request against `develop` with `Closes #123` in the description. I
 | Backend | `gofmt -l ./cmd ./internal ./tests`, `go vet ./...`, `go test ./...`, `go build ./...`, and the `scripts/test-*.ps1` suite for whatever you changed |
 | Web | `npm run lint`, `npm run format:check`, `npm run test:coverage`, `npm run build` |
 | Mobile | `dart format --set-exit-if-changed .`, `flutter analyze`, `flutter test`, `flutter build apk --debug` |
-| Firmware | `pio test -e native_test`, `pio run -e esp32prod` |
+| ESP32 firmware | `pio test -e native_test`, `pio run -e esp32prod` |
 | These docs | `npm run build` in `docs/` |
 
 ## House rules

@@ -1,13 +1,13 @@
 ---
 title: Quick start
-description: Run the full HostelHive stack on your machine, from database to gate simulation.
+description: Run the full HostelHive stack on your machine, from the database to the gate scanners.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
 This gets every part of HostelHive running locally, in the order they depend on each other.
 
-You'll need Go 1.27.3 or newer, Docker Desktop, and Node.js 22.16.0 (the version in the frontend's `.nvmrc`). Flutter 3.47 is only needed for the mobile app, and PlatformIO with the Wokwi VS Code extension only for the gate simulator.
+You'll need Go 1.27.3 or newer, Docker Desktop, and Node.js 22.16.0 (the version in the frontend's `.nvmrc`). Flutter 3.47 is only needed for the mobile app, and an ESP32 board only if you're setting up a gate.
 
 <Aside>The backend's helper scripts are PowerShell, so the commands below are too. On macOS or Linux, set the same environment variables in your shell and run the Go commands directly.</Aside>
 
@@ -60,7 +60,7 @@ You'll need Go 1.27.3 or newer, Docker Desktop, and Node.js 22.16.0 (the version
 
    Leave `.env` empty and the app runs on demo data instead.
 
-7. To try a gate without hardware, register a scanner, put its credential in the firmware's `secrets.h`, and run the Wokwi simulation. See [Configure and flash](/hardware/setup/) and [Wokwi simulation](/hardware/simulation/).
+7. To set up a gate, register a scanner, put its credential in the firmware's `secrets.h` and flash it to an ESP32. See [Configure and flash](/hardware/setup/).
 
 </Steps>
 
