@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Logo from '../components/Logo.astro';
-import { DOCS_URL, GITHUB_ORG, repos } from '../config';
+import { DEMO_URL, DOCS_URL, GITHUB_ORG, repos } from '../config';
 
 import githubIcon from '@phosphor-icons/core/assets/regular/github-logo.svg?raw';
 import arrowIcon from '@phosphor-icons/core/assets/regular/arrow-right.svg?raw';
@@ -15,7 +15,7 @@ import staffLogin from '../assets/screens/web-staff-login.png';
 import studentLogin from '../assets/screens/web-login-mobile.png';
 
 const forStudents = [
-	'Their QR pass, always on their phone',
+	'One pass, on their RFID card and their phone',
 	'Late-access requests and Going Home',
 	'Complaints, with photos',
 	'Notices and their own movement history',
@@ -31,7 +31,7 @@ const forStaff = [
 
 <Base
 	title="HostelHive, open-source hostel management"
-	description="QR passes at the gate, live presence for wardens, and one place for late-access requests, complaints and rooms. Open source."
+	description="RFID cards at the gate, live presence for wardens, and one place for late-access requests, complaints and rooms. Open source."
 >
 	<header class="nav wrap">
 		<a href="/" aria-label="HostelHive home"><Logo /></a>
@@ -41,7 +41,10 @@ const forStaff = [
 			<a href="#hardware">Hardware</a>
 			<a href="#open-source">Open source</a>
 		</nav>
-		<a class="btn btn-primary nav-docs" href={DOCS_URL}>Read the docs</a>
+		<div class="nav-actions">
+			<a class="btn btn-secondary nav-btn nav-docs" href={DOCS_URL}>Read the docs</a>
+			<a class="btn btn-primary nav-btn" href={DEMO_URL}>Live demo</a>
+		</div>
 	</header>
 
 	<main>
@@ -49,10 +52,11 @@ const forStaff = [
 			<div class="hero-copy">
 				<h1>The signing book, <span class="accent">replaced.</span></h1>
 				<p class="lede">
-					QR passes at the gate, live presence for wardens, and one place for late-access requests, complaints and rooms.
+					RFID cards at the gate, live presence for wardens, and one place for late-access requests, complaints and rooms.
 				</p>
 				<div class="actions">
-					<a class="btn btn-primary" href={`${DOCS_URL}/getting-started/quick-start/`}>Read the docs <Fragment set:html={arrowIcon} /></a>
+					<a class="btn btn-primary" href={DEMO_URL}>Try the live demo <Fragment set:html={arrowIcon} /></a>
+					<a class="btn btn-secondary" href={`${DOCS_URL}/getting-started/quick-start/`}>Read the docs</a>
 					<a class="btn btn-secondary" href={GITHUB_ORG}><Fragment set:html={githubIcon} /> GitHub</a>
 				</div>
 			</div>
@@ -77,15 +81,15 @@ const forStaff = [
 				class="gate-photo"
 			/>
 			<div class="gate-copy">
-				<h2>A pass on every phone. A scanner at every gate.</h2>
+				<h2>A card for every student. A reader at every gate.</h2>
 				<p>
-					Students carry one QR pass. It holds a random ID and nothing personal. The scanner at the gate asks the server
+					Students tap one RFID card. It holds a random pass and nothing personal. The reader at the gate asks the server
 					before it opens, and the warden's screen updates within seconds.
 				</p>
 				<ol class="steps">
 					<li>
-						<h3>Show the pass</h3>
-						<p>From the app, the web portal, or a printed card.</p>
+						<h3>Tap the card</h3>
+						<p>The card carries the same pass the student sees in the app.</p>
 					</li>
 					<li>
 						<h3>The gate checks with the server</h3>
@@ -134,8 +138,8 @@ const forStaff = [
 			<div class="hardware-copy">
 				<h2>No answer from the server? The gate stays shut.</h2>
 				<p>
-					The scanner is an ESP32 with a small screen, two lights, a buzzer and a relay for the lock. It never decides on its
-					own. No network, a timeout or an error all leave the gate locked, and staff use a logged override button instead.
+					The reader is a NodeMCU board with an RC522 RFID reader, a buzzer and a relay for the lock. It never decides on
+					its own. No network, a timeout or an error all leave the gate locked, and staff use a logged override button instead.
 				</p>
 				<p>
 					Every gate has its own credential, which an admin can replace at any time. It talks to the server over TLS
@@ -145,26 +149,11 @@ const forStaff = [
 			</div>
 			<Image
 				src={breadboard}
-				alt="An ESP32 prototype on a breadboard with jumper wires"
+				alt="A microcontroller prototype on a breadboard with jumper wires"
 				widths={[480, 900, 1300]}
 				sizes="(max-width: 860px) 100vw, 55vw"
 				class="hardware-photo"
 			/>
-		</section>
-
-		<section class="numbers wrap" aria-label="Measured results">
-			<div>
-				<strong>100</strong>
-				<p>Lighthouse performance score on the student sign-in page</p>
-			</div>
-			<div>
-				<strong>107</strong>
-				<p>API operations, each documented in the built-in API explorer</p>
-			</div>
-			<div>
-				<strong>0</strong>
-				<p>Passwords stored by HostelHive. Sign-in is handled by Firebase.</p>
-			</div>
 		</section>
 
 		<section id="open-source" class="oss">
@@ -180,7 +169,7 @@ const forStaff = [
 					<h2>Run it for your hostel.</h2>
 					<p>
 						HostelHive is open source and split into four parts you can deploy on their own. The docs walk through setup,
-						deployment and building the gate scanners.
+						deployment and building the gate readers.
 					</p>
 					<a class="btn btn-primary" href={`${DOCS_URL}/getting-started/quick-start/`}>Read the docs <Fragment set:html={arrowIcon} /></a>
 				</div>
@@ -206,6 +195,7 @@ const forStaff = [
 			<Logo />
 			<p>Started as a SENG 34213 project at the University of Kelaniya.</p>
 			<nav aria-label="Footer">
+				<a href={DEMO_URL}>Live demo</a>
 				<a href={DOCS_URL}>Docs</a>
 				<a href={GITHUB_ORG}>GitHub</a>
 			</nav>
@@ -248,7 +238,12 @@ const forStaff = [
 		color: var(--ink);
 	}
 
-	.nav-docs {
+	.nav-actions {
+		display: flex;
+		gap: 0.6rem;
+	}
+
+	.nav-btn {
 		padding: 0.55rem 1rem;
 	}
 
@@ -469,37 +464,6 @@ const forStaff = [
 		transform: translateX(3px);
 	}
 
-	/* Numbers: plain, separated by rules */
-	.numbers {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		border-block: 1px solid var(--line);
-	}
-
-	.numbers div {
-		padding: 2rem 2rem 2rem 0;
-	}
-
-	.numbers div + div {
-		padding-left: 2rem;
-		border-left: 1px solid var(--line);
-	}
-
-	.numbers strong {
-		display: block;
-		font-size: clamp(2.25rem, 4vw, 3rem);
-		font-weight: 800;
-		letter-spacing: -0.04em;
-		line-height: 1;
-	}
-
-	.numbers p {
-		margin-top: 0.6rem;
-		max-width: 17rem;
-		font-size: 0.95rem;
-		color: var(--muted);
-	}
-
 	/* Open source: full-width photo, then intro and repo list */
 	.oss {
 		padding-top: clamp(3.5rem, 8vw, 7rem);
@@ -634,18 +598,11 @@ const forStaff = [
 			grid-template-columns: 1fr;
 		}
 
-		.numbers {
-			grid-template-columns: 1fr;
-		}
+	}
 
-		.numbers div,
-		.numbers div + div {
-			padding: 1.5rem 0;
-			border-left: none;
-		}
-
-		.numbers div + div {
-			border-top: 1px solid var(--line);
+	@media (max-width: 520px) {
+		.nav-docs {
+			display: none;
 		}
 	}
 </style>
